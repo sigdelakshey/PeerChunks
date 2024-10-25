@@ -1,0 +1,6 @@
+peer_port: 8080
+bootstrap_peers:
+  - "127.0.0.1:8081"
+  - "127.0.0.1:8082"
+storage_path: "./storage"
+encryption_key: "a3f5c6d7e8f90123456789abcdef0123456789abcdef0123456789abcdef0123"
