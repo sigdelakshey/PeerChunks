@@ -1,4 +1,4 @@
-use crate::peer::encryption::{encrypt, decrypt, EncryptionError};
+use crate::peer::encryption::{encrypt, decrypt};
 use tokio::net::TcpStream;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use std::error::Error;

@@ -1,6 +1,6 @@
 use aes_gcm::aead::{Aead, KeyInit, OsRng};
 use aes_gcm::{Aes256Gcm, Nonce};
-use cipher::{BlockCipher, BlockEncrypt, BlockDecrypt, InvalidLength};
+use cipher::InvalidLength;
 use rand::RngCore;
 use hex;
 use thiserror::Error;

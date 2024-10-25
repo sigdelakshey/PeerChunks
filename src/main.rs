@@ -3,6 +3,7 @@ use env_logger::Env;
 use log::{error, info};
 use crate::config::Config;
 use crate::peer::discovery::start_peer_discovery;
+use crate::ui::cli::run_cli;
 use std::error::Error;
 use tokio::sync::mpsc;
 use std::fs;
@@ -10,6 +11,7 @@ use std::path::Path;
 
 mod config;
 mod peer;
+mod ui;
 
 #[derive(Parser)]
 #[command(name = "PeerChunks")]
@@ -68,10 +70,10 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
         }
         
         let (tx, _rx) = mpsc::channel(100);
-        let _peer_discovery_handle = tokio::spawn(start_peer_discovery(config.clone(), tx.clone()));
+        let peer_discovery_handle = tokio::spawn(start_peer_discovery(config.clone(), tx.clone()));
+        let cli_handle = tokio::spawn(run_cli(tx.clone()));
+        let _ = tokio::join!(peer_discovery_handle, cli_handle);
         
-        // cli handling
-
         info!("PeerChunks has stopped.");
     }
 
