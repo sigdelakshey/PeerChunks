@@ -2,11 +2,14 @@ use clap::{Parser, Subcommand};
 use env_logger::Env;
 use log::{error, info};
 use crate::config::Config;
+use crate::peer::discovery::start_peer_discovery;
 use std::error::Error;
+use tokio::sync::mpsc;
 use std::fs;
 use std::path::Path;
 
 mod config;
+mod peer;
 
 #[derive(Parser)]
 #[command(name = "PeerChunks")]
@@ -63,7 +66,12 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
             fs::create_dir_all(&config.storage_path)?;
             info!("Created storage directory at {}", config.storage_path);
         }
-        // start peer discovery and cli handling
+        
+        let (tx, _rx) = mpsc::channel(100);
+        let _peer_discovery_handle = tokio::spawn(start_peer_discovery(config.clone(), tx.clone()));
+        
+        // cli handling
+
         info!("PeerChunks has stopped.");
     }
 
