@@ -1,6 +1,8 @@
+// src/config.rs
+
 use serde::Deserialize;
-use std::fs::File;
-use std::io::Read;
+use std::fs;
+use std::error::Error;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {
@@ -11,10 +13,8 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn load(path: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let mut file = File::open(path)?;
-        let mut contents = String::new();
-        file.read_to_string(&mut contents)?;
+    pub fn load<P: AsRef<std::path::Path>>(path: P) -> Result<Self, Box<dyn Error>> {
+        let contents = fs::read_to_string(path)?;
         let config: Config = serde_yaml::from_str(&contents)?;
         Ok(config)
     }

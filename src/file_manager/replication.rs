@@ -1,7 +1,6 @@
-use crate::file_manager::chunker::ChunkMetadata;
 use crate::peer::discovery::Peer;
 use crate::peer::connection::send_chunk_to_peer;
-use std::error::Error;
+use std::{error::Error, path::Path};
 use log::{info, error};
 
 const REPLICATION_FACTOR: usize = 2;
@@ -32,11 +31,11 @@ fn get_total_chunks(storage_dir: &str, file_id: &uuid::Uuid) -> Result<usize, Bo
     Ok(chunks.len())
 }
 
-fn select_peers_for_replication(
-    peers: &[Peer],
-    file_id: &uuid::Uuid,
+fn select_peers_for_replication<'a>(
+    peers: &'a [Peer],
+    file_id: &'a uuid::Uuid,
     chunk_index: usize,
-) -> Result<Vec<&Peer>, Box<dyn Error + Send + Sync>> {
+) -> Result<Vec<&'a Peer>, Box<dyn Error + Send + Sync>> {
     let available_peers: Vec<&Peer> = peers.iter()
         .filter(|peer| !peer.address.contains(&file_id.to_string())) // Avoid self-replication
         .collect();
@@ -56,17 +55,17 @@ fn select_peers_for_replication(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::file_manager::chunker::{ChunkMetadata, split_file_into_chunks};
+    use crate::file_manager::chunker::ChunkMetadata;
     use crate::peer::discovery::Peer;
     use uuid::Uuid;
-    use std::io::Write;
+    use std::fs;
     use tempfile::TempDir;
 
     async fn mock_send_chunk_to_peer(
-        peer: &Peer,
-        storage_dir: &str,
-        file_id: &Uuid,
-        chunk_index: usize,
+        _peer: &Peer,
+        _storage_dir: &str,
+        _file_id: &Uuid,
+        _chunk_index: usize,
     ) -> Result<(), Box<dyn Error + Send + Sync>> {
         Ok(())
     }

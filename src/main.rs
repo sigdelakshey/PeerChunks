@@ -12,6 +12,8 @@ use std::path::Path;
 mod config;
 mod peer;
 mod ui;
+mod file_manager;
+
 
 #[derive(Parser)]
 #[command(name = "PeerChunks")]
