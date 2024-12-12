@@ -1,10 +1,8 @@
-// src/main.rs
-
 use clap::{Parser, Subcommand};
 use env_logger::Env;
 use log::{error, info};
 use crate::config::Config;
-use crate::peer::discovery::start_peer_discovery;
+use crate::peer::discovery::{start_peer_discovery, Peer};
 use crate::ui::cli::run_cli;
 use crate::indexing::dht::DHT;
 use std::error::Error;
@@ -61,14 +59,16 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     }
 
     let dht = DHT::new();
-    let peers = Vec::new(); // Will be populated when connecting to bootstrap peers
+    let local_peer = Peer {
+        address: format!("127.0.0.1:{}", config.peer_port),
+    };
 
     let (tx, rx) = mpsc::channel(100);
 
     let encryption_key = config.encryption_key.clone();
+    let peers = Vec::new();
 
-    let peer_discovery_handle = tokio::spawn(start_peer_discovery(config.clone(), tx.clone()));
-
+    let peer_discovery_handle = tokio::spawn(start_peer_discovery(config.clone(), tx.clone(), dht.clone(), local_peer.clone()));
     let cli_handle = tokio::spawn(run_cli(rx, dht, config.storage_path.clone(), peers, encryption_key));
 
     let _ = tokio::join!(peer_discovery_handle, cli_handle);

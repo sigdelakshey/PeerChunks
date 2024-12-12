@@ -62,10 +62,10 @@ mod tests {
     use tempfile::TempDir;
 
     async fn mock_send_chunk_to_peer(
-        _peer: &Peer,
-        _storage_dir: &str,
-        _file_id: &Uuid,
-        _chunk_index: usize,
+        peer: &Peer,
+        storage_dir: &str,
+        file_id: &Uuid,
+        chunk_index: usize,
     ) -> Result<(), Box<dyn Error + Send + Sync>> {
         Ok(())
     }
